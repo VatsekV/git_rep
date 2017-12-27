@@ -595,4 +595,5 @@ imperial_marketing$compaign <- tolower(imperial_marketing$compaign)
   
   
   # ----
-  #first commit
+  # тепрь я добавляю сюда новую функцию
+  # и пишу много умных слов
