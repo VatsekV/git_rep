@@ -161,6 +161,7 @@
                                   where u.application_id=52
                                     and u.reg_date>'2017-09-01'	
                                     and u.user_group_id!=380270
+                                    and u.user_group_id!=380270
                                   group by 1,2,3,4,5,6,7,8,9")
   
   
@@ -595,7 +596,9 @@ imperial_marketing$compaign <- tolower(imperial_marketing$compaign)
   
   
   # Гит----
-  # тепрь я добавляю сюда новую функцию
+  # тепрь я добавляю сюда новую функциюM
   # и пишу много умных слов
   
   # Еще гит
+  
+  # Тут значит я такой переписываю заросы
