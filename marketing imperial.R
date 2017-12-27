@@ -594,6 +594,8 @@ imperial_marketing$compaign <- tolower(imperial_marketing$compaign)
   
   
   
-  # ----
+  # Гит----
   # тепрь я добавляю сюда новую функцию
   # и пишу много умных слов
+  
+  # Еще гит
