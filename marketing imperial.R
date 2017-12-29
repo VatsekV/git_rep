@@ -94,7 +94,7 @@
                      host="127.0.0.1",
                      port="5432")
   
-  geo_tbl <- read.csv(file="C:/Users/user/Google ????/09.2017/??????? ????????/GEO 2.csv",sep=';')
+  geo_tbl <- read.csv(file="C:/Users/user/Google Диск/09.2017/Скрипты Империал/GEO 2.csv",sep=';')
   # 
   # geo_tbl <- xlsx::read.xlsx(file="C:/Users/user-c015/Google Drive/09.2017/?????????????? ????????????????/GEO.xlsx", 
   #                            sheetIndex=1,
@@ -103,7 +103,7 @@
   geo_tbl$V2 <- gsub(pattern = " ", replacement = "" ,x = geo_tbl$V2)
   geo_tbl$V1 <- paste0("_",geo_tbl$V1, "_")
   
-  target_tbl <- read.csv("C:/Users/user/Google ????/Imperial tablo csv data/campaign_names_target.csv", sep=";")
+  target_tbl <- read.csv("C:/Users/user/Google Диск/Imperial tablo csv data/campaign_names_target.csv", sep=";")
   target_tbl <- target_tbl[,c(1,2)]
   target_tbl <- unique(target_tbl)
   colnames(target_tbl) <- c("Campaign_ID","Campaign_Name")
@@ -114,92 +114,132 @@
   # Load from DB -----------------------
   
   imperial_lvl_ups <- dbGetQuery( con_v4,"
-                                  select
-                                  u.application_id as Application_id,
-                                  date_trunc('day', case when ug.p[3]='''mail.ru_int''' then u.reg_date + interval '3 hour' else u.reg_date end ) as Reg_date,
-                                  case when a.media_source is not null then a.media_source else 'Organic' end as Media_source,
-                                  case when a.af_channel is not null then a.af_channel else 'Non' end as Ad_platform,
-                                  case 
-                                        when a.media_source='adcolony_int'  then a.af_c_id 
-    		                                when a.media_source='Facebook Ads' then a.af_adset else
-                                          case when a.campaign is not null then a.campaign else 'Non' end end as Compaign,
-                                  case when a.af_ad is not null then a.af_ad else 'Non' end as Ad,
-                                  case when a.af_ad_type is not null then a.af_ad_type else 'Non' end as Placement,
-                                  case 
-                                      when a.platform is not null then( 
-                                      case 
-                                          when a.platform='ios' then 'iOS'
-                                          when a.platform='android' then 'Android'
-                                          else 'Unknown' end)
-                                      else replace(ug.p[6],'''','') end as Device_platform,
-                                  case 
-                                    when a.device_type like ('%iPhone%') then 'iPhone'
-                                    when a.device_type like ('%iPad%') then 'iPad'
-                                    when a.device_type is null then 'Unknown'
-                                    else 'Android phone or tablet' end as Device_type,
-                                  -- replace(p.p[1],'''','') as lvl,
-                                  sum(case 
-                                  when replace(p.p[1],'''','')::int >2 then 1 
-                                  else null end) as lvlup1,
-                                  sum(case 
-                                  when replace(p.p[1],'''','')::int >3 then 1 
-                                  else null end) as lvlup3,
-                                  sum(case 
-                                  when replace(p.p[1],'''','')::int >7 then 1 
-                                  else null end) as lvlup7,
-                                  sum(case 
-                                  when replace(p.p[1],'''','')::int >8 then 1
-                                  else null end) as lvlup8,
-                                  sum(case 
-                                  when replace(p.p[1],'''','')::int >10 then 1
-                                  else null end) as lvlup10,
-                                  count (*) as installs
-                                  from users u
-                                  left join progress p on u.progress_id=p.id
-                                  left join attribution a on a.user_id=u.id
-                                  left join user_groups ug on ug.id=u.user_group_id
-                                  where u.application_id=52
-                                    and u.reg_date>'2017-09-01'	
-                                    and u.user_group_id!=380270
-                                    and u.user_group_id!=380270
-                                  group by 1,2,3,4,5,6,7,8,9")
+select
+u.application_id as Application_id,
+date_trunc('day', case 
+  when ug.p[3]='''mail.ru_int''' then u.reg_date + interval '3 hour' 
+  else u.reg_date end ) as Reg_date,
+case 
+  when a.media_source is not null then a.media_source 
+  else 'Organic' end as Media_source,
+case 
+  when a.af_channel is not null then a.af_channel 
+  else 'Non' end as Ad_platform,
+case 
+  when a.media_source='adcolony_int'  then a.af_c_id 
+  when a.media_source='Facebook Ads' then a.af_adset 
+  else case 
+        when a.campaign is not null then a.campaign 
+        else 'Non' end end as Compaign,
+case 
+  when a.af_ad is not null then a.af_ad 
+  else 'Non' end as Ad,
+case 
+  when a.af_ad_type is not null then a.af_ad_type 
+  else 'Non' end as Placement,
+case 
+  when a.platform is not null then( 
+  case 
+    when a.platform='ios' then 'iOS'
+    when a.platform='android' then 'Android'
+    else 'Unknown' end)
+  else replace(ug.p[6],'''','') end as Device_platform,
+case 
+  when a.device_type like ('%iPhone%') then 'iPhone'
+  when a.device_type like ('%iPad%') then 'iPad'
+  when a.device_type is null then 'Unknown'
+  else 'Android phone or tablet' end as Device_type,
+-- replace(p.p[1],'''','') as lvl,
+sum(case 
+  when replace(p.p[1],'''','')::int >2 then 1 
+  else null end) as lvlup1,
+sum(case 
+  when replace(p.p[1],'''','')::int >3 then 1 
+  else null end) as lvlup3,
+sum(case 
+  when replace(p.p[1],'''','')::int >7 then 1 
+  else null end) as lvlup7,
+sum(case 
+  when replace(p.p[1],'''','')::int >8 then 1
+  else null end) as lvlup8,
+sum(case 
+  when replace(p.p[1],'''','')::int >10 then 1
+  else null end) as lvlup10,
+count (*) as installs
+from users u
+  left join progress p on u.progress_id=p.id
+  left join attribution a on a.user_id=u.id
+  left join user_groups ug on ug.id=u.user_group_id
+where u.application_id=52
+  and u.reg_date>'2017-01-01'   
+  and u.user_group_id!=380270
+group by 1,2,3,4,5,6,7,8,9")
   
   
   imperial_ret <- dbGetQuery( con_v4,"
-                                select
-                                  u.application_id as Application_id,
-                              date_trunc('day', case when ug.p[3]='''mail.ru_int''' then u.reg_date + interval '3 hour' else u.reg_date end ) as Reg_date,
-                              case when a.media_source is not null then a.media_source else 'Organic' end as Media_source,
-                              case when a.af_channel is not null then a.af_channel else 'Non' end as Ad_platform,
-                              case when a.media_source='adcolony_int' 
-    		                        then a.af_c_id when a.media_source='Facebook Ads' then a.af_adset else
-                                case when a.campaign is not null then a.campaign else 'Non' end end as Compaign,
-                              case when a.af_ad is not null then a.af_ad else 'Non' end as Ad,
-                              case when a.af_ad_type is not null then a.af_ad_type else 'Non' end as Placement,
-                              case when a.platform is not null then( 
-                              case when a.platform='ios' then 'iOS'
-                              when a.platform='android' then 'Android'
-                              else 'Unknown' end)
-                              else replace(ug.p[6],'''','') end as Device_platform,
-                              case 
-                                  when a.device_type like ('%iPhone%') then 'iPhone'
-                                  when a.device_type like ('%iPad%') then 'iPad'
-                                  when a.device_type is null then 'Unknown'
-                                  else 'Android phone or tablet' end as Device_type,
-                              count(distinct (case when S.date::date = U.reg_date::date + 1 then U.id else null end)) as ret_1,
-                              count(distinct (case when S.date::date = U.reg_date::date + 3 then U.id else null end)) as ret_3,
-                              count(distinct (case when S.date::date = U.reg_date::date + 7 then U.id else null end)) as ret_7,
-                              count(distinct (case when S.date::date = U.reg_date::date + 14 then U.id else null end)) as ret_14,
-                              count(distinct (case when S.date::date = U.reg_date::date + 28 then U.id else null end)) as ret_28,
-                              count (distinct u.id) as installs
-                              from users u
-                              left join attribution a on a.user_id=u.id
-                              left join sessions s on s.user_id=u.id
-                              left join user_groups ug on ug.id=u.user_group_id
-                              where u.application_id=52	
-                              and u.reg_date>'2017-09-01'
-                              and u.user_group_id!=380270
-                              group by 1,2,3,4,5,6,7,8,9")
+
+select
+u.application_id as Application_id,
+date_trunc('day', case 
+when ug.p[3]='''mail.ru_int''' then u.reg_date + interval '3 hour' 
+else u.reg_date end ) as Reg_date,
+case 
+when a.media_source is not null then a.media_source 
+else 'Organic' end as Media_source,
+case 
+when a.af_channel is not null then a.af_channel 
+else 'Non' end as Ad_platform,
+case 
+when a.media_source='adcolony_int' then a.af_c_id 
+when a.media_source='Facebook Ads' then a.af_adset 
+else case 
+when a.campaign is not null then a.campaign 
+else 'Non' end end as Compaign,
+case 
+when a.af_ad is not null then a.af_ad 
+else 'Non' end as Ad,
+case 
+when a.af_ad_type is not null then a.af_ad_type 
+else 'Non' end as Placement,
+case 
+when a.platform is not null then( case 
+when a.platform='ios' then 'iOS'
+when a.platform='android' then 'Android'
+else 'Unknown' end)
+else replace(ug.p[6],'''','') end as Device_platform,
+case
+when a.device_type like ('%iPhone%') then 'iPhone'
+when a.device_type like ('%iPad%') then 'iPad'
+when a.device_type is null then 'Unknown'
+else 'Android phone or tablet' end as Device_type,
+sum(t.ret_1)  as ret_1,
+sum(t.ret_3)  as ret_3,
+sum(t.ret_7)  as ret_7,
+sum(t.ret_14)  as ret_14,
+sum(t.ret_28)  as ret_28,
+count (distinct u.id) as installs
+from users u
+left join attribution a on a.user_id=u.id
+left join (						
+select
+u.id,
+(case when S.date::date = U.reg_date::date + 1 then 1 else null end) as ret_1,
+(case when S.date::date = U.reg_date::date + 3 then 1 else null end) as ret_3,
+(case when S.date::date = U.reg_date::date + 7 then 1 else null end) as ret_7,
+(case when S.date::date = U.reg_date::date + 14 then 1 else null end) as ret_14,
+(case when S.date::date = U.reg_date::date + 28 then 1 else null end) as ret_28
+from users u
+left join sessions s on s.user_id=u.id
+where u.application_id=52
+and u.reg_date>'2017-01-01'
+and s.date>'2017-01-01'
+and date_part('day', s.date-u.reg_date)<30
+and u.user_group_id!=380270 ) t on t.id=u.id
+left join user_groups ug on ug.id=u.user_group_id
+where u.application_id=52
+and u.reg_date>'2017-01-01'
+and u.user_group_id!=380270
+group by 1,2,3,4,5,6,7,8,9")
   
   imperial_pays <- dbGetQuery( con_v4,paste( "
                                 select
@@ -324,12 +364,12 @@
                                                                                                                                                                             ifelse(grepl("FB_inst_EKIM_io_mix__RUS_LAL_sessions100after4d_1865__M_ru__17/11",vctr, ignore.case = T),"FB_inst_SNIM_io_mix__RUS_LAL_sessions100after4d_1865__M_ru__24/11",vctr
                                                                                                                                                                             )))))))))))))))))))))))))
   }
-  fail<- read.csv("C:/Users/user/Google ????/Imperial tablo csv data/fail.csv", sep = ";")
+  fail<- read.csv("C:/Users/user/Google Диск/Imperial tablo csv data/fail.csv", sep = ";")
   imperial_all$compaign <- failrepairfunction(imperial_all$compaign)
   # Load spent from FB and join all together ----
    #FB----
   
-  spent <- read.csv("C:/Users/user/Google ????/Imperial tablo csv data/lifetime_fb.csv")
+  spent <- read.csv("C:/Users/user/Google Диск/Imperial tablo csv data/lifetime_fb.csv")
   #spent <- read.csv("/Users/cu037/Google Drive/09.2017/Скрипты ?мпериал/Imperial-USD-Ads-Lifetime.csv")
   spent1 <- spent[,c(1,3,4,5,6,8,9,10,11,12)]
   colnames(spent1) <- c("reg_date","compaign","ad","ad_platform","placement","device_type","impressions","uniquelinkclicks","spent","installs")
@@ -368,7 +408,7 @@
    #Unity ----
   
   imperial_unity <- subset.data.frame(imperial_all, media_source=="unityads_int")
-  spent_unity <- read.csv("C:/Users/user/Google ????/09.2017/??????? ????????/imperial_unity.csv")
+  spent_unity <- read.csv("C:/Users/user/Google Диск/09.2017/Скрипты Империал/imperial_unity.csv")
   for (i in 1:nrow(spent_unity)) {
     spent_unity$compaign[i] <- strsplit(spent_unity$Campaign.name[i],"-")[[1]][2]
   #  spent_unity$ad[i] <- strsplit(spent_unity$Campaign.name[i],"-")[[1]][3]
@@ -394,7 +434,7 @@
   
    #myTarget----
   
-  spent_target <- read.csv("C:/Users/user/Google ????/Imperial tablo csv data/lifetime_target.csv", encoding = "UTF-8")
+  spent_target <- read.csv("C:/Users/user/Google Диск/Imperial tablo csv data/lifetime_target.csv", encoding = "UTF-8")
   colnames(spent_target) <- c("reg_date","compaign","age_mytarget","sex_mytarget","impressions","uniquelinkclicks","installs","spent","ctr","cr","cta")
   spent_target <- spent_target[,c(1,2,5,6,8)]
   spent_target$reg_date <- as.Date(spent_target$reg_date)
@@ -443,7 +483,7 @@
   imperial_marketing <- merge(imperial_marketing,imperial_target,all = TRUE)
   
    #AdColony----
-  spent_adcolony <- read.csv("C:/Users/user/Google ????/09.2017/??????? ????????/adcolony_lifetime.csv")
+  spent_adcolony <- read.csv("C:/Users/user/Google Диск/09.2017/Скрипты Империал/adcolony_lifetime.csv")
   spent_adcolony <- spent_adcolony[,c(1,5,6,12,13)]
   colnames(spent_adcolony) <- c("reg_date","compaign","impressions","uniquelinkclicks","spent")
   spent_adcolony$reg_date <- as.Date(spent_adcolony$reg_date)
@@ -473,7 +513,7 @@
   imperial_marketing <- merge(imperial_marketing,imperial_adcolony,all = TRUE)
   
    #Vungle----
-  spent_vungle <- read.csv("C:/Users/user/Google ????/09.2017/??????? ????????/vungle_lifetime.csv")
+  spent_vungle <- read.csv("C:/Users/user/Google Диск/09.2017/Скрипты Империал/vungle_lifetime.csv")
   spent_vungle <- spent_vungle[,c(1,6,11,14,19)]
   colnames(spent_vungle) <- c("reg_date","compaign","impressions","uniquelinkclicks","spent")
   spent_vungle$reg_date <- as.Date(spent_vungle$reg_date)
@@ -581,7 +621,7 @@ imperial_marketing$compaign <- tolower(imperial_marketing$compaign)
   imperial_marketing$installs <- imperial_marketing$installs.x
   imperial_marketing$money <- imperial_marketing$money_999
   imperial_marketing$payers<- imperial_marketing$payer_999
-  setwd("C:/Users/user/Google ????/09.2017/??????? ????????")
+  setwd("C:/Users/user/Google Диск/09.2017/Скрипты Империал")
   #setwd("/Users/cu037/Google Drive/09.2017/?????????????? ????????????????")
   write.table( 
     x = imperial_marketing,
